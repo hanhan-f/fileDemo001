@@ -21,6 +21,8 @@ public class attribute_view extends JDialog {
     String name;
     JLabel fileName, attribute, fileAddress, fileSize, fileTime_creat, fileTime_change, fileTime_visit;
     JTextField fileName_t, fileAddress_t, fileSize_t, fileTime_creat_t, fileTime_change_t, fileTime_visit_t;
+    JCheckBox cRead,cWrite;
+    Boolean canRead=true,canWrite=true;
 
     public attribute_view(JFrame parent, File file) {
         super(parent, "Custom Dialog", true);
@@ -112,6 +114,8 @@ public class attribute_view extends JDialog {
         fileTime_creat_t = new JTextField(creatTime);
         fileTime_change_t = new JTextField(modifiedTime);
         fileTime_visit_t = new JTextField(visitTime);
+        cRead=new JCheckBox("可读");
+        cWrite=new JCheckBox("可写");
 
         fileName_t.setBounds(100, 100, 140, 20);
         fileAddress_t.setBounds(100, 120, 140, 20);
@@ -119,6 +123,8 @@ public class attribute_view extends JDialog {
         fileTime_creat_t.setBounds(100, 160, 140, 20);
         fileTime_change_t.setBounds(100, 180, 140, 20);
         fileTime_visit_t.setBounds(100, 200, 140, 20);
+        cRead.setBounds(100, 240, 20, 20);
+        cWrite.setBounds(140, 240, 20, 20);
 
 
         panel.add(p);
@@ -128,6 +134,8 @@ public class attribute_view extends JDialog {
         panel.add(fileTime_creat_t);
         panel.add(fileTime_change_t);
         panel.add(fileTime_visit_t);
+        panel.add(cRead);
+        panel.add(cWrite);
 
 
         this.setVisible(true);
@@ -149,5 +157,14 @@ public class attribute_view extends JDialog {
         return s;
     }
 
+    //判断文件读写权限
 
+
+    public Boolean getCanRead(File file) {
+        return file.canRead();
+    }
+
+    public Boolean getCanWrite(File file) {
+        return file.canWrite();
+    }
 }
