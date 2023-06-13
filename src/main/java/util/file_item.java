@@ -22,7 +22,6 @@ public class file_item extends JPanel {
         this.setPreferredSize(new Dimension(800,800));
 //        this.setPreferredSize(new Dimension(500,400));
         JLabel nu=new JLabel("null",JLabel.CENTER);
-        this.setBackground(Color.red);
         this.add(nu);
     }
     public file_item(File file){

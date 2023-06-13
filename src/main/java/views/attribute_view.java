@@ -19,10 +19,9 @@ public class attribute_view extends JDialog {
     BufferedImage image;
     File img;
     String name;
-    JLabel fileName, attribute, fileAddress, fileSize, fileTime_creat, fileTime_change, fileTime_visit;
+    JLabel fileName, attribute, fileAddress, fileSize, fileTime_creat, fileTime_change, fileTime_visit,FileRead;
     JTextField fileName_t, fileAddress_t, fileSize_t, fileTime_creat_t, fileTime_change_t, fileTime_visit_t;
-    JCheckBox cRead,cWrite;
-    Boolean canRead=true,canWrite=true;
+    JCheckBox readOnly;
 
     public attribute_view(JFrame parent, File file) {
         super(parent, "Custom Dialog", true);
@@ -107,15 +106,15 @@ public class attribute_view extends JDialog {
             e.printStackTrace();
         }
         double fileSize_byte = getFilesize(file);
-        double fileSize_kb=fileSize_byte/1024;
+        double fileSize_kb = fileSize_byte / 1024;
         fileName_t = new JTextField(file.getName());
         fileAddress_t = new JTextField(file.getAbsolutePath());
-        fileSize_t = new JTextField(String.valueOf(fileSize_kb)+"KB");
+        fileSize_t = new JTextField(String.valueOf(fileSize_kb) + "KB");
         fileTime_creat_t = new JTextField(creatTime);
         fileTime_change_t = new JTextField(modifiedTime);
         fileTime_visit_t = new JTextField(visitTime);
-        cRead=new JCheckBox("可读");
-        cWrite=new JCheckBox("可写");
+        readOnly = new JCheckBox();
+        FileRead=new JLabel("只读");
 
         fileName_t.setBounds(100, 100, 140, 20);
         fileAddress_t.setBounds(100, 120, 140, 20);
@@ -123,8 +122,10 @@ public class attribute_view extends JDialog {
         fileTime_creat_t.setBounds(100, 160, 140, 20);
         fileTime_change_t.setBounds(100, 180, 140, 20);
         fileTime_visit_t.setBounds(100, 200, 140, 20);
-        cRead.setBounds(100, 240, 20, 20);
-        cWrite.setBounds(140, 240, 20, 20);
+        readOnly.setBounds(100, 240, 20, 20);
+        FileRead.setBounds(120, 240, 120, 20);
+        setRead(file,readOnly);
+
 
 
         panel.add(p);
@@ -134,8 +135,8 @@ public class attribute_view extends JDialog {
         panel.add(fileTime_creat_t);
         panel.add(fileTime_change_t);
         panel.add(fileTime_visit_t);
-        panel.add(cRead);
-        panel.add(cWrite);
+        panel.add(readOnly);
+        panel.add(FileRead);
 
 
         this.setVisible(true);
@@ -148,7 +149,7 @@ public class attribute_view extends JDialog {
             File[] files = file.listFiles();
             if (files != null) {
                 for (File file1 : files) {
-                    s+=getFilesize(file1);
+                    s += getFilesize(file1);
                 }
             }
         } else if (file.isFile()) {
@@ -160,11 +161,11 @@ public class attribute_view extends JDialog {
     //判断文件读写权限
 
 
-    public Boolean getCanRead(File file) {
-        return file.canRead();
+    public void setRead(File file, JCheckBox cRead) {
+        cRead.setSelected(!file.canWrite());
+        cRead.addActionListener(e -> {
+            file.setWritable(!cRead.isSelected());
+        });
     }
 
-    public Boolean getCanWrite(File file) {
-        return file.canWrite();
-    }
 }
