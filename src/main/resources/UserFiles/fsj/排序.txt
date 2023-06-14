@@ -1,0 +1,222 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define MAX 640
+struct node{//定义分区
+	int address, size;
+	struct node *next;
+};
+typedef struct node RECT;
+
+/*函数定义*/
+RECT *assignment(RECT *head, int application);
+void firstfit(RECT *head, RECT *heada, RECT *back1);
+void bestfit(RECT *head, RECT *back1);
+int backcheck(RECT *head, RECT *back1);
+void print(RECT *head);
+
+/*变量定义*/
+RECT *head, *heada, *back, *assign1, *p;
+int application1, maxblocknuml;
+char way;
+int main(){
+	char choose;
+	int check;
+	RECT *allocated;
+	head = malloc(sizeof(RECT));
+	p = malloc(sizeof(RECT));
+	head->size = MAX;
+	head->address = 0;
+	head->next = p;
+	maxblocknuml = 1;
+	p->size = MAX;
+	p->address = 0;
+	p->next = NULL;
+	print(head);
+	heada = malloc(sizeof(RECT));
+	heada->size = 0;
+	heada->address = 0;
+	heada->next = NULL;
+	way = 'f';
+	do{
+		printf("Enter the allocate or reclaim (a/r),or press other key to exit.\n");
+		scanf("%c", &choose);
+		if (tolower(choose) == 'a'){
+			printf("Inputalpplication:\n");
+			scanf("%d", &application1);
+			assign1 = assignment(head, application1);
+			if (assign1->address == -1)
+				printf("Too large application! Allocation fails!\n\n");
+			else
+				printf("Allocation Success! ADDRESS=%5d\n", assign1->address);
+			printf("\n***********Unallocated Table********\n");
+			print(head);
+			printf("\n**********Allocated Table*************\n");
+			print(heada);
+		}
+		else if (tolower(choose == 'r')){
+			back = malloc(sizeof(RECT));
+			printf("Input address and size:\n");
+			scanf("%d%d", &back->address, &back->size);
+			check = backcheck(head, back);
+			if (check == 1){
+				if (tolower(way) == 'f')
+					firstfit(head, heada, back);
+				printf("\n**********Unallocated Table***********\n");
+				print(head);
+				printf("\n**********Allocated Table*************\n");
+				print(heada);
+			}
+		}
+	} while (tolower(choose) == 'a' || tolower(choose) == 'r');
+	exit(0);
+}//main end
+/*内存分配函数*/
+RECT *assignment(RECT *head, int application){
+	RECT *after, *before, *assign;
+	assign = malloc(sizeof(RECT));
+	assign->size = application;
+	assign->next = NULL;
+	if (application > head->size || application < 0)
+		assign->address = -1;
+	else{
+		before = head;
+		after = head->next;
+		while (after->size < application){
+			before = before->next;
+			after = after->next;
+		}
+		if (after->size == application){
+			if (after->size == head->size)
+				maxblocknuml--;
+			before->next = after->next;
+			assign->address = after->address;
+			free(after);
+		}
+		else{
+			if (after->size == head->size)
+				maxblocknuml--;
+			after->size = after->size - application;
+			assign->address = after->address + after->size;
+		}
+		if (maxblocknuml == 0){
+			before = head;
+			head->size = 0;
+			maxblocknuml = 1;
+			while (before != NULL){
+				if (before->size > head->size){
+					head->size = before->size;
+					maxblocknuml = 1;
+				}
+				else if (before->size == head->size)
+					maxblocknuml++;
+				before = before->next;
+			}
+		}
+	}
+	assign1 = assign;
+
+	//修改已分配分区表，添加节点
+	after = heada;
+	while (after->next != NULL)
+		after = after->next;
+	after->next = assign;
+	heada->size++;
+
+	return assign1;//返回分配给用户的地址
+}
+
+/*首先适应回收算法*/
+void firstfit(RECT *head, RECT *heada, RECT *back1){
+	RECT *before, *after, *back2;
+	int insert, del;
+	back2 = malloc(sizeof(RECT));
+	back2->address = back1->address;
+	back2->size = back1->size;
+	back2->next = back1->next;
+	before = head;
+	after = head->next;
+	insert = 0;
+	while (!insert){
+		if ((after == NULL) | ((back1->address) && (back1->address >= before->address))){
+			before->next = back1;
+			back1->next = after;
+			insert = 1;
+		}
+		else{
+			before = before->next;
+			after = after->next;
+		}
+	}
+	if (back1->address == before->address + before->size){
+		before->size = before->size + back1->size;
+		before->next = back1->next;
+		free(back1);
+		back1 = before;
+	}
+	if ((after != NULL) && (after->address == back1->address + back1->size)){
+		back1->size = back1->size + after->size;
+		back1->next = after->next;
+		free(after);
+	}
+	if (head->size < back->size){
+		head->size = back1->size;
+		maxblocknuml = 1;
+	}
+	else if (head->size == back1->size)
+		maxblocknuml++;
+
+	//修改已分配分区表，删除相应节点
+	before = head;
+	after = heada->next;
+	del = 0;
+	while (!del || after != NULL){
+		if ((after->address == back2->address) && (after->size == back2->size)){
+			before->next = after->next;
+			free(after);
+			del = 1;
+		}
+		else{
+			before = before->next;
+			after = after->next;
+		}
+	}
+	heada->size--;
+}
+
+/*打印输出链表*/
+void print(RECT *output){
+	RECT *before;
+	int index;
+	before = output->next;
+	index = 0;
+	if (output->next == NULL)
+		printf("No part for print!\n");
+	else{
+		printf("index****address****end****size****\n");
+		while (before != NULL){
+			printf("---------------------------\n");
+			printf("%-9d%-9d%-9d%-9d\n", index, before->address, before->address + before->size - 1, before->size);
+			printf("---------------------------\n");
+			index++;
+			before = before->next;
+		}
+	}		
+}
+
+/*检查回收块收到合法性，back1为要回收节点地址*/
+int backcheck(RECT *head, RECT *back1){
+	RECT *before;
+	int check = 1;
+	if (back1->address < 0 || back1->size < 0)
+		check = 0;//地址大小不能为负数
+	before=head->next;
+	while((before!=NULL)&&check)
+		if(((back1->address<before->address)&&(back1->address+back1->size>before->address))||((back1->address>=before->address)&&(back1->address<before->address+before->size)))
+			check=0;
+		else
+			before=before->next;
+	if(check==0)
+		printf("Error input!\n");
+	return check;
+}
