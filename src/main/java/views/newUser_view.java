@@ -10,7 +10,7 @@ import Dao.user_dao;
 public class newUser_view extends JFrame {
     JLabel ul,pwdl,rpwdl;
     JTextField userTest,pwd,rpwd;
-    JButton new_user;
+    JButton new_user,back;
     Boolean canCreak=true;
     public void nView() {
         JFrame frame = new JFrame("CreatNewUser");
@@ -19,6 +19,7 @@ public class newUser_view extends JFrame {
         frame.setLocationRelativeTo(null);
         JPanel root = new JPanel();
         frame.setContentPane(root);
+        root.setLayout(null);
 
         ul = new JLabel("用户名");
         userTest = new JTextField();
@@ -28,16 +29,28 @@ public class newUser_view extends JFrame {
         pwd = new JPasswordField();
         pwd.setPreferredSize(new Dimension(45, 15));
 
-        rpwdl=new JLabel("请再次输入密码");
+        rpwdl=new JLabel("请再次输入");
         rpwd=new JPasswordField();
         rpwd.setPreferredSize(new Dimension(45, 15));
         new_user = new JButton("创建");
+        back=new JButton("取消");
+
+
+        ul.setBounds(50,40,80,20);
+        userTest.setBounds(120,40,150,20);
+        pwdl.setBounds(50,80,80,20);
+        pwd.setBounds(120,80,150,20);
+        rpwdl.setBounds(50,120,80,20);
+        rpwd.setBounds(120,120,150,20);
+        new_user.setBounds(150,160,120,20);
+        back.setBounds(280,160,60,20);
+        back.setFont(new Font("Serif", Font.BOLD,10));
 
         new_user.addActionListener(e -> {
             String id=userTest.getText();
             String p1=pwd.getText();
             String p2=rpwd.getText();
-            if(id==null||p1==null||p2==null){
+            if(id.equals("")||p1.equals("")||p2.equals("")){
                 JOptionPane.showMessageDialog(null,"输入不能为空","tips",JOptionPane.PLAIN_MESSAGE);
             } else if (!p1 .equals(p2)) {
                 JOptionPane.showMessageDialog(null,"两次密码输入不一致","tips",JOptionPane.PLAIN_MESSAGE);
@@ -95,6 +108,10 @@ public class newUser_view extends JFrame {
                 }
             }
         });
+        back.addActionListener(e -> {
+            frame.setVisible(false);
+            new loginView().lView();
+        });
 
         root.add(ul);
         root.add(userTest);
@@ -103,6 +120,7 @@ public class newUser_view extends JFrame {
         root.add(rpwdl);
         root.add(rpwd);
         root.add(new_user);
+        root.add(back);
 
         frame.setVisible(true);
     }
