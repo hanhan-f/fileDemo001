@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 
 import views.*;
 
@@ -90,6 +91,7 @@ public class addFile_item extends JLabel {
     private static void showManu(MouseEvent me, File file, file_item item) {
         JPopupMenu menu = new JPopupMenu();
         JMenuItem item1 = new JMenuItem("打开");
+        JMenuItem item6 = new JMenuItem("打开方式");
         JMenuItem item2 = new JMenuItem("重命名");
         JMenuItem item3 = new JMenuItem("删除");
         JMenuItem item4 = new JMenuItem("新建");
@@ -142,14 +144,58 @@ public class addFile_item extends JLabel {
 
             }
         });
+        item6.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                creatMenu(me,file,false,1);
+
+            }
+        });
+        if(file.isDirectory()) {
+            item6.setVisible(false);
+        }else {
+            item6.setVisible(true);
+        }
 
         menu.add(item1);
+        menu.add(item6);
         menu.add(item2);
         menu.add(item3);
         menu.add(item4);
         menu.add(item5);
+
         menu.show(me.getComponent(), me.getX(), me.getY());
 
+    }
+    //打开方式选择
+    private static void creatMenu(MouseEvent e,File file,Boolean isNull,int x){
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem item1 = new JMenuItem("直接打开");
+        JMenuItem item2 = new JMenuItem("外部程序打开");
+        //使用java程序打开
+        item1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Main_view.getRightPane().open(file);
+            }
+        });
+        //使用外部程序打开
+        item2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String cmd = "cmd /c start "+file.getAbsolutePath();
+                    Runtime.getRuntime().exec(cmd).waitFor();
+                } catch (IOException ev) {
+                    ev.printStackTrace();
+                } catch (InterruptedException ev) {
+                    ev.printStackTrace();
+                }
+            }
+        });
+        menu.add(item1);
+        menu.add(item2);
+        menu.show(e.getComponent(), e.getX(), e.getY());
     }
     private static void creatMenu(MouseEvent e,File file,Boolean isNull){
         JPopupMenu menu = new JPopupMenu();
